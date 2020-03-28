@@ -1,0 +1,22 @@
+{
+  "name": "zkrollup-bot-keybase",
+  "version": "1.0.0",
+  "description": "Bot to check zkRollup status and sends notifications on a keybase conversation",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "list:chats": "node index.js ls"
+  },
+  "keywords": [
+    "rollup",
+    "keybase",
+    "bot"
+  ],
+  "author": "krlosMata",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "keybase-bot": "^3.6.1",
+    "yargs": "^15.3.1"
+  }
+}

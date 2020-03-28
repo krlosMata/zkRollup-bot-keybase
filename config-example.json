@@ -1,0 +1,11 @@
+{
+  "keybase": {
+    "user": "userNameX",
+    "pass": "paperKey",
+    "conversationId": "channelId"
+  },
+  "rollup": {
+    "url": "rollupUrl",
+    "lastAccount": 4
+  }
+}
