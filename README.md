@@ -8,13 +8,13 @@ It sends notifications automatically to a keybase conversation if:
 
 ## Config
 ### Keybase
-`user`: user name
-`pass`: paper key
-`conversationId`: conversation identifier
+- `user`: user name
+- `pass`: paper key
+- `conversationId`: conversation identifier
 
 ### Rollup
-`url`: rollup url
-`lastAccount`: last account found
+- `url`: rollup url
+- `lastAccount`: last account found
 
 ### Example
 ```json
