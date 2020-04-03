@@ -11,7 +11,7 @@ class RollupCli {
     return res.data;
   }
 
-  async getInfoAccount(){
+  async getInfoAccount(id){
     const res = await axios.get(`${this.url}/accounts/${id}`);
     return res.data;
   }

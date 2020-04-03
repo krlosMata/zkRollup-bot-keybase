@@ -23,6 +23,7 @@ const command = (argv._[0]) ? argv._[0].toUpperCase() : "default";
   try {
     // Global vars
     const TIMEOUT = 3 * 60 * 1000;
+    const TIMEOUT_ACCOUNT_FOUND = 5 * 1000;
     let lastBatchSynched = 0;
 
     // load configuration file
@@ -34,7 +35,7 @@ const command = (argv._[0]) ? argv._[0].toUpperCase() : "default";
     const username = config.keybase.user;
     const paperkey = config.keybase.pass;
     const conversationId = config.keybase.conversationId;
-    const lastAccount = config.rollup.lastAccount;
+    let lastAccount = config.rollup.lastAccount;
 
     // Rollup Client initialization
     const rollupCli = new RollupCli(config.rollup.url);
@@ -79,6 +80,19 @@ const command = (argv._[0]) ? argv._[0].toUpperCase() : "default";
           continue;
         }
 
+        // Check if new account has been added
+        try {
+          const accountInfo = await rollupCli.getInfoAccount(lastAccount + 1);
+          message += "MESSAGE: new account has been added\n";
+          message += `TOTAL ACCOUNTS: ${accountInfo.idx}`;
+          await actions.sendMessage(bot, conversationId, message);
+          await saveLastAccount(accountInfo.idx);
+          await utils.timeout(TIMEOUT_ACCOUNT_FOUND);
+          continue;
+        } catch (error){
+          ;
+        }
+
         // check if batch has increased correctly
         if (lastBatch <= lastBatchSynched){
           message += "MESSAGE: Last batch has not been increased properly";
@@ -87,17 +101,6 @@ const command = (argv._[0]) ? argv._[0].toUpperCase() : "default";
           continue;
         } else lastBatchSynched = lastBatch;
 
-        // Check if new account has been added
-        try {
-          const accountInfo = await rollupCli.getInfoAccount(lastAccount + 1);
-          message += "MESSAGE: new account has been added\n";
-          message += `TOTAL ACCOUNTS: ${accountInfo.idx}`;
-          await actions.sendMessage(bot, conversationId, message);
-          await saveLastAccount(accountInfo.idx);
-        } catch (error){
-          ;
-        }
-        
         await utils.timeout(TIMEOUT);
       }
     }
@@ -142,7 +145,8 @@ const command = (argv._[0]) ? argv._[0].toUpperCase() : "default";
 
     // Save last account
     async function saveLastAccount(newLastAccount){
-      config.lastAccount = newLastAccount;
+      lastAccount = newLastAccount;
+      config.rollup.lastAccount = newLastAccount;
       fs.writeFileSync("./config.json", JSON.stringify(config));
     }
 
