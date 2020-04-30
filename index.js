@@ -104,8 +104,8 @@ const command = (argv._[0]) ? argv._[0].toUpperCase() : "default";
 
           await utils.timeout(TIMEOUT);
         } catch (error){
-          console.log(errror.stack);
-          console.log("ERROR: " + errror);
+          console.log(error.stack);
+          console.log("ERROR: " + error);
           await timeout(TIMEOUT);
         }
       }
@@ -156,9 +156,9 @@ const command = (argv._[0]) ? argv._[0].toUpperCase() : "default";
       fs.writeFileSync("./config.json", JSON.stringify(config));
     }
 
-  } catch (errror){
-    console.log(errror.stack);
-    console.log("ERROR: " + errror);
+  } catch (error){
+    console.log(error.stack);
+    console.log("ERROR: " + error);
     process.exit(1);
   }
 })();
