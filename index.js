@@ -64,44 +64,50 @@ const command = (argv._[0]) ? argv._[0].toUpperCase() : "default";
       await actions.sendMessage(bot, conversationId, hiMess);
 
       while (true){
-        // get current time
-        const time = await utils.getTimeStr();
-        let message = `${time}\n`;
-
-        // check state
-        let lastBatch;
         try {
-          const resStatus = await rollupCli.getStatus();
-          lastBatch = resStatus.rollupSynch.lastBatchSynched;
+          // get current time
+          const time = await utils.getTimeStr();
+          let message = `${time}\n`;
+
+          // check state
+          let lastBatch;
+          try {
+            const resStatus = await rollupCli.getStatus();
+            lastBatch = resStatus.rollupSynch.lastBatchSynched;
+          } catch (error){
+            message += "MESSAGE: Not possible to get rollup state";
+            await actions.sendMessage(bot, conversationId, message);
+            await checkStateBack();
+            continue;
+          }
+
+          // Check if new account has been added
+          try {
+            const accountInfo = await rollupCli.getInfoAccount(lastAccount + 1);
+            message += "MESSAGE: new account has been added\n";
+            message += `TOTAL ACCOUNTS: ${accountInfo.idx}`;
+            await actions.sendMessage(bot, conversationId, message);
+            await saveLastAccount(accountInfo.idx);
+            await utils.timeout(TIMEOUT_ACCOUNT_FOUND);
+            continue;
+          } catch (error){
+            ;
+          }
+
+          // check if batch has increased correctly
+          if (lastBatch <= lastBatchSynched){
+            message += "MESSAGE: Last batch has not been increased properly";
+            await actions.sendMessage(bot, conversationId, message);
+            await checkBatchBack(lastBatch);
+            continue;
+          } else lastBatchSynched = lastBatch;
+
+          await utils.timeout(TIMEOUT);
         } catch (error){
-          message += "MESSAGE: Not possible to get rollup state";
-          await actions.sendMessage(bot, conversationId, message);
-          await checkStateBack();
-          continue;
+          console.log(errror.stack);
+          console.log("ERROR: " + errror);
+          await timeout(TIMEOUT);
         }
-
-        // Check if new account has been added
-        try {
-          const accountInfo = await rollupCli.getInfoAccount(lastAccount + 1);
-          message += "MESSAGE: new account has been added\n";
-          message += `TOTAL ACCOUNTS: ${accountInfo.idx}`;
-          await actions.sendMessage(bot, conversationId, message);
-          await saveLastAccount(accountInfo.idx);
-          await utils.timeout(TIMEOUT_ACCOUNT_FOUND);
-          continue;
-        } catch (error){
-          ;
-        }
-
-        // check if batch has increased correctly
-        if (lastBatch <= lastBatchSynched){
-          message += "MESSAGE: Last batch has not been increased properly";
-          await actions.sendMessage(bot, conversationId, message);
-          await checkBatchBack(lastBatch);
-          continue;
-        } else lastBatchSynched = lastBatch;
-
-        await utils.timeout(TIMEOUT);
       }
     }
     
